@@ -1,20 +1,22 @@
 import { applyMiddleware, createStore, Store } from 'redux';
+import { routerMiddleware } from 'connected-react-router';
+import { createBrowserHistory as createHistory } from 'history';
 import { composeWithDevTools } from 'redux-devtools-extension';
 
-import { rootReducer, RootState } from '../reducers';
+export const history = createHistory();
+
+import { createRootReducer, RootState } from '../reducers';
 
 const configureStore = (initialState?: RootState): Store<RootState | undefined> => {
-    const middlewares: any[] = [];
+    const middlewares: any[] = [routerMiddleware(history)];
     const enhancer = composeWithDevTools(applyMiddleware(...middlewares));
-    return createStore(rootReducer, initialState, enhancer);
+    return createStore(createRootReducer(history), initialState, enhancer);
 };
 
-const store = configureStore();
+export const store = configureStore();
 
 if (typeof module.hot !== 'undefined') {
     module.hot.accept('../reducers', () =>
         store.replaceReducer(require('../reducers').rootReducer)
     );
 }
-
-export default store;
